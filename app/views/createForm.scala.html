@@ -1,0 +1,42 @@
+@(budgieForm: Form[Budgie])(implicit messages: Messages)
+
+@import helper._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapInput.f) }
+
+
+@main {
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+        $('#file').on("change", function(){
+            $('#picture').val($('#file').val())
+            });
+        });
+    </script>
+
+    <h1>Add a budgie</h1>
+    @form(routes.Application.save(), 'enctype -> "multipart/form-data") {
+        
+        <fieldset>
+            <div class="form-group">
+                @inputText(budgieForm("name"), '_label -> "Name", '_help -> "", 'class -> "form-control")
+                @inputText(budgieForm("colour"), '_label -> "Colour", '_help -> "")
+                @inputText(budgieForm("race"), '_label -> "Race", '_help -> "")
+                @select(budgieForm("gender"),
+                options = options(List("M","F")), '_label -> "Gender", '_help -> "")
+                @inputFile(budgieForm("file"), '_label -> "File", '_help -> "")
+                @inputText(budgieForm("picture"), '_label -> "Picture", '_help -> "")
+            </div>
+        </fieldset>
+        
+        <div class="actions">
+            <input type="submit" value="Create this budgie" class="btn primary"> or
+            <a href="@routes.Application.list()" class="btn">Cancel</a> 
+        </div>
+
+
+    }
+        </div>
+    
+}

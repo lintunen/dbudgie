@@ -1,0 +1,123 @@
+@import play.api.i18n.Messages.Implicits._
+
+@(currentPage: Page[(Budgie)], currentOrderBy: Int, currentFilter: String)(implicit flash: play.api.mvc.Flash, messages: Messages)
+
+@****************************************
+* Helper generating navigation links    *
+****************************************@
+@link(newPage: Int, newOrderBy: Option[Int] = None) = @{
+    routes.Application.list(newPage, newOrderBy.map { orderBy =>
+        if(orderBy == scala.math.abs(currentOrderBy)) -currentOrderBy else orderBy
+    }.getOrElse(currentOrderBy), currentFilter)
+    
+}
+
+@**********************************
+* Helper generating table headers *
+***********************************@
+@header(orderBy: Int, title: String) = {
+    <th class="col@orderBy header @if(scala.math.abs(currentOrderBy) == orderBy) @{if(currentOrderBy < 0) "headerSortDown" else "headerSortUp"}">
+        <a href="@link(0, Some(orderBy))">@title</a>
+    </th>
+}
+
+@main {
+    
+    <h1>Budgies!</h1>
+
+    @flash.get("success").map { message =>
+        <div class="alert alert-dismissible alert-success">
+            <strong>Done!</strong> @message
+        </div>
+    }
+
+    @flash.get("error").map { message =>
+        <div class="alert alert-dismissible alert-danger">
+            <strong>Error</strong> @message
+        </div>
+    }
+
+    @flash.get("warning").map { message =>
+        <div class="alert alert-dismissible alert-warning">
+            <strong>Warning</strong> @message
+        </div>
+    }
+
+    <div id="actions">
+        
+        @helper.form(action=routes.Application.list()) {
+                <div class="form-group form-inline">
+                <input type="search" id="searchbox" class="form-control" name="f" value="@currentFilter" placeholder="Filter by budgie name...">
+                <input type="submit" id="searchsubmit" value="Filter by name" class="btn btn-primary">
+                </div>
+        }
+        
+        <a class="btn btn-success" id="add" href="@routes.Application.create()">Add a new budgie</a>
+        
+    </div>
+    
+    @Option(currentPage.items).filterNot(_.isEmpty).map { budgies =>
+        
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    @header(1, "Picture")
+                    @header(2, "Budgie name")
+                    @header(3, "Colour")
+                    @header(4, "Race")
+                    @header(5, "Gender")
+                </tr>
+            </thead>
+            <tbody>
+
+                @budgies.map {
+                case (budgie) => {
+                <tr>
+                    <td>
+                        <img src="/assets/images/@budgie.picture" alt="Image not uploaded" />
+                    </td>
+                    <td><a href="@routes.Application.edit(budgie.id.get)">@budgie.name</a></td>
+                    <td>
+                        @budgie.colour
+                    </td>
+                    <td>
+                        @budgie.race
+                    </td>
+                    <td>
+                        @budgie.gender
+                    </td>
+                </tr>
+                }
+            }
+            </tbody>
+        </table>
+
+        <div>
+            <ul class="pagination pagination-lg">
+                @currentPage.prev.map { page =>
+                    <li class="prev">
+                        <a href="@link(page)">&larr; Previous</a>
+                    </li> 
+                }.getOrElse {
+                    <li class="prev disabled">
+                        <a>&larr; Previous</a>
+                    </li>
+                }
+                <li class="current">
+                    <a>Displaying @(currentPage.offset + 1) to @(currentPage.offset + budgies.size) of @currentPage.total</a>
+                </li>
+                @currentPage.next.map { page =>
+                    <li class="next">
+                        <a href="@link(page)">Next &rarr;</a>
+                    </li> 
+                }.getOrElse {
+                    <li class="next disabled">
+                        <a>Next &rarr;</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+}
+
+            
