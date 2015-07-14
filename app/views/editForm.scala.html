@@ -38,6 +38,6 @@
     }
     
     @form(routes.Application.delete(id), 'class -> "topRight") {
-        <input type="submit" value="Delete this budgie" class="btn danger">
+        <input type="submit" value="Delete this budgie" class="btn danger" onclick="return confirm('Are you sure you want to delete this budgie?');">
     }
 }
